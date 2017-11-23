@@ -58,7 +58,7 @@ create or replace package body util as
 		RETURN NUMBER IS new_performance_id NUMBER;
 		BEGIN
 			INSERT INTO PERFORMANCE(performanseName, performancePrice, description)
-			VALUES(performanseName, performancePrice, description) RETURNING PERFORMANCE.PERFORMANCEID
+			VALUES(performanseName, performancePrice, TO_BLOB(description)) RETURNING PERFORMANCE.PERFORMANCEID
 			INTO new_performance_id;
 			RETURN(new_performance_id);
 		END create_performance;
@@ -137,4 +137,5 @@ create or replace package body util as
 			UPDATE PERFORMANCE
 				SET PERFORMANCEPRICE = PERFORMANCEPRICE * 1.05;
 		END;
+
 END util;

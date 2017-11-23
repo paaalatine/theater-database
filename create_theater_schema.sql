@@ -9,12 +9,14 @@ CREATE OR REPLACE TYPE FIO AS OBJECT
 	RETURN VARCHAR2
 );
 
+
 CREATE OR REPLACE TYPE BODY FIO AS
   	MEMBER FUNCTION abbreviation RETURN VARCHAR2 IS
   	BEGIN
   	RETURN surname+substr(firstName, 1, 1)+'. '+substr(secondName, 1, 1)+'.';
   	END;
 END;
+
 
 /*SERVICES*/
 
@@ -103,7 +105,7 @@ CREATE TABLE Performance
   	performanceId NUMBER NOT NULL PRIMARY KEY,
   	performanseName VARCHAR2(30),
 	performancePrice NUMBER CHECK(performancePrice>=500 AND performancePrice<=5000),
-	description VARCHAR2(50)
+	description BLOB
 );
 
 CREATE SEQUENCE performance_id_seq
@@ -122,15 +124,41 @@ CREATE OR REPLACE TRIGGER autoincrement_tr_performance
 		FROM DUAL;
 	END;
 
+CREATE TABLE ROLE
+(
+	roleId NUMBER NOT NULL PRIMARY KEY,
+	roleName VARCHAR2(20),
+	performanceId NUMBER,
+	CONSTRAINT fk_role FOREIGN KEY(performanceId)
+	REFERENCES PERFORMANCE(performanceId)
+);
+
+
+CREATE SEQUENCE role_id_seq
+	START WITH 1
+	INCREMENT BY 1
+	NOCACHE;
+
+CREATE OR REPLACE TRIGGER autoincrement_tr_role
+	BEFORE INSERT
+	ON ROLE
+	REFERENCING NEW AS NEW
+	FOR EACH ROW
+	BEGIN
+		SELECT role_id_seq.NEXTVAL
+		INTO :NEW.roleId
+		FROM DUAL;
+	END;
+
 /*CAST*/
 
 CREATE TABLE Cast
 (
   	castId NUMBER NOT NULL PRIMARY KEY,
-  	performanceId NUMBER,
+  	roleId NUMBER,
 	personId NUMBER,
-	CONSTRAINT fk_cast_1 FOREIGN KEY(performanceId)
-	REFERENCES PERFORMANCE(performanceId),
+	CONSTRAINT fk_cast_1 FOREIGN KEY(roleId)
+	REFERENCES ROLE(roleId),
 	CONSTRAINT fk_cast_2 FOREIGN KEY(personId)
 	REFERENCES STAFF(personId)
 );
@@ -317,3 +345,4 @@ CREATE OR REPLACE TRIGGER autoincrement_tr_booking
 		INTO :NEW.bookingId
 		FROM DUAL;
 	END;
+

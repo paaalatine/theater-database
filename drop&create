@@ -1,0 +1,9 @@
+sqlplus sys as sysdba
+
+Shutdown immediate;
+startup;
+
+drop user NAME cascade;
+create user NAME identified by q;
+GRANT CONNECT, RESOURCE, DBA TO NAME;
+grant all privileges to NAME;
