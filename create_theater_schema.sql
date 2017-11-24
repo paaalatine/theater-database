@@ -104,7 +104,7 @@ CREATE OR REPLACE TRIGGER autoincrement_tr_staff
 CREATE TABLE Performance
 (
   	performanceId NUMBER NOT NULL PRIMARY KEY,
-  	performanseName VARCHAR2(30),
+  	performanceName VARCHAR2(30),
 	performancePrice NUMBER CHECK(performancePrice>=500 AND performancePrice<=5000),
 	description BLOB
 );

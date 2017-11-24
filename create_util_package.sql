@@ -8,7 +8,7 @@ create or replace package util as
 
 	FUNCTION create_post(postName VARCHAR2, salary NUMBER, serviceId NUMBER) RETURN NUMBER;
 	FUNCTION create_performance(
-		performanseName VARCHAR2,
+		performanceName VARCHAR2,
 		performancePrice NUMBER,
 		description VARCHAR2)
 		RETURN NUMBER;
@@ -53,13 +53,13 @@ create or replace package body util as
 
 
 	FUNCTION create_performance(
-		performanseName VARCHAR2,
+		performanceName VARCHAR2,
 		performancePrice NUMBER,
 		description VARCHAR2)
 		RETURN NUMBER IS new_performance_id NUMBER;
 		BEGIN
-			INSERT INTO PERFORMANCE(performanseName, performancePrice, description)
-			VALUES(performanseName, performancePrice, TO_BLOB(description)) RETURNING PERFORMANCE.PERFORMANCEID
+			INSERT INTO PERFORMANCE(performanceName, performancePrice, description)
+			VALUES(performanceName, performancePrice, TO_BLOB(description)) RETURNING PERFORMANCE.PERFORMANCEID
 			INTO new_performance_id;
 			RETURN(new_performance_id);
 		END create_performance;

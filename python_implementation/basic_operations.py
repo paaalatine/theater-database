@@ -7,7 +7,7 @@ table = namedtuple('Name', 'name id_field fields')
 Service     = table("service",      "serviceId",    ("serviceName",))
 Post        = table("post",         "postId",       ("postName", "salary", "serviceId"))
 Staff       = table("staff",        "StaffId",      ("name", "postId"))
-Performance = table("performance",  "PerformanceId",("performanseName", "performansePrice", "description"))
+Performance = table("performance",  "PerformanceId",("performanceName", "performancePrice", "description"))
 Role        = table("role",         "RoleId",       ("roleName", "PerformanceId"))
 Cast        = table("cast",         "CastId",       ("roleId", "personId"))
 Requisite   = table("requisite",    "RequisiteId",  ("requisiteName", "requisitePrice"))
@@ -124,21 +124,11 @@ def process_function(func):
 
 def prices_up():
     cursor.execute('BEGIN UTIL.UPD_PRICES_FOR_5_PERCENT; END;')
-    read(Requisite)
-    print("=====================================================")
-    read(Post)
-    print("=====================================================")
-    read(Performance)
     connection.commit()
 
 
 def prices_down():
     cursor.execute('BEGIN UTIL.UPD_PRICES_FOR_5_PERCENT_DOWN; END;')
-    read(Requisite)
-    print("=====================================================")
-    read(Post)
-    print("=====================================================")
-    read(Performance)
     connection.commit()
 
 
@@ -153,6 +143,15 @@ def print_theater_expenses():
 
 
 if __name__ == '__main__':
+    if sys.argv[1] == "performance" and sys.argv[2] == "create":
+        fields = fixup_fields(Performance.fields)
+        query = ('INSERT INTO performance{} VALUES (\'{}\', {}, TO_BLOB(\'{}\'))'
+                 .format(fields, sys.argv[3], sys.argv[4], sys.argv[5]))
+        print(query)
+        cursor.execute(query)
+        connection.commit()
+        exit(0)
+
     if sys.argv[1] in package_functions:
         process_function(sys.argv[1])
         exit(0)
