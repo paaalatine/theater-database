@@ -31,15 +31,29 @@ def select_template(table):
         print result
 
 
+def delete_template(table, field, value):
+    query = 'DELETE FROM {} WHERE {}={}'.format(table, field, value)
+    print(query)
+    cursor.execute(query)
+
+
 connection = cx_Oracle.connect('NAME/q@localhost:1521')
 cursor = connection.cursor()
 
+print('===================================================')
 create_template('REQUISITE', ('REQUISITENAME', 'REQUISITEPRICE'), ('brains', '1000'))
 select_template('REQUISITE')
 
 print('===================================================')
+delete_template('REQUISITE', 'REQUISITEID', 48)
+select_template('REQUISITE')
 
+print('===================================================')
 create_template('SERVICE', ('SERVICENAME',), ('stage', ))
+select_template('SERVICE')
+
+print('===================================================')
+delete_template('SERVICE', 'SERVICEID', 14)
 select_template('SERVICE')
 
 # connection.commit()
