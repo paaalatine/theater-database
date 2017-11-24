@@ -23,7 +23,8 @@ create or replace package util as
 
 	PROCEDURE read_timetable;
 
-	PROCEDURE update_prices_for_5_percent;
+	PROCEDURE upd_prices_for_5_percent;
+	PROCEDURE upd_prices_for_5_percent_down;
 
 end util;
 
@@ -81,10 +82,12 @@ create or replace package body util as
 
 
 	FUNCTION read_theater_expenses RETURN NUMBER IS
-		summary NUMBER;
+		req_summary NUMBER;
+		post_summary NUMBER;
 		BEGIN
-			SELECT SUM(REQUISITEPRICE + SALARY) INTO summary FROM REQUISITE, POST;
-			RETURN(summary);
+			SELECT SUM(REQUISITEPRICE) INTO req_summary FROM REQUISITE;
+			SELECT SUM(SALARY) INTO post_summary FROM POST;
+			RETURN(req_summary + post_summary);
 		END;
 
 	PROCEDURE print_theater_expenses as
@@ -128,7 +131,7 @@ create or replace package body util as
 			end loop;
 		end;
 
-	PROCEDURE update_prices_for_5_percent AS
+	PROCEDURE upd_prices_for_5_percent AS
 		BEGIN
 			UPDATE REQUISITE
 				SET REQUISITEPRICE = REQUISITEPRICE * 1.05;
@@ -136,6 +139,16 @@ create or replace package body util as
 				SET SALARY = SALARY * 1.05;
 			UPDATE PERFORMANCE
 				SET PERFORMANCEPRICE = PERFORMANCEPRICE * 1.05;
+		END;
+
+	PROCEDURE upd_prices_for_5_percent_down AS
+		BEGIN
+			UPDATE REQUISITE
+				SET REQUISITEPRICE = REQUISITEPRICE * 0.95;
+			UPDATE POST
+				SET SALARY = SALARY * 0.95;
+			UPDATE PERFORMANCE
+				SET PERFORMANCEPRICE = PERFORMANCEPRICE * 0.95;
 		END;
 
 END util;

@@ -33,6 +33,11 @@ operations = ("create",
               "update",
               "delete")
 
+package_functions = ("delete",
+                     "priceup",
+                     "expen",
+                     "pricedown")
+
 connection = cx_Oracle.connect('NAME/q@localhost:1521')
 cursor = connection.cursor()
 
@@ -83,7 +88,6 @@ def update(table, values):
         print(info_string)
 
 
-
 def delete(table, value):
     value = value[0]
     query = 'DELETE FROM {} WHERE {}={}'.format(table.name, table.id_field, value)
@@ -99,15 +103,60 @@ def delete(table, value):
 def process_operation(table, operation, fields_info):
     if operation == "create":
         create(table, fields_info)
-    if operation == "read":
+    elif operation == "read":
         read(table)
-    if operation == "update":
+    elif operation == "update":
         update(table, fields_info)
-    if operation == "delete":
+    elif operation == "delete":
         delete(table, fields_info)
 
 
+def process_function(func):
+    if func == "delete":
+        delete_all()
+    elif func == "priceup":
+        prices_up()
+    elif func == "expen":
+        print_theater_expenses()
+    elif func == "pricedown":
+        prices_down()
+
+
+def prices_up():
+    cursor.execute('BEGIN UTIL.UPD_PRICES_FOR_5_PERCENT; END;')
+    read(Requisite)
+    print("=====================================================")
+    read(Post)
+    print("=====================================================")
+    read(Performance)
+    connection.commit()
+
+
+def prices_down():
+    cursor.execute('BEGIN UTIL.UPD_PRICES_FOR_5_PERCENT_DOWN; END;')
+    read(Requisite)
+    print("=====================================================")
+    read(Post)
+    print("=====================================================")
+    read(Performance)
+    connection.commit()
+
+
+def delete_all():
+    cursor.execute('BEGIN UTIL.delete_all_the_theater; END;')
+    connection.commit()
+
+
+def print_theater_expenses():
+    myvar = cursor.callfunc('UTIL.read_theater_expenses', cx_Oracle.NUMBER)
+    print myvar
+
+
 if __name__ == '__main__':
+    if sys.argv[1] in package_functions:
+        process_function(sys.argv[1])
+        exit(0)
+
     for table in tables:
         if sys.argv[1] == table.name and sys.argv[2] in operations:
             process_operation(table, sys.argv[2], sys.argv[3:])
